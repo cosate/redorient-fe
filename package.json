@@ -1,26 +1,38 @@
 {
-  "name": "redorient-fe",
+  "name": "mcp-client-typescript",
   "version": "1.0.0",
-  "description": "A React TypeScript frontend project with search functionality",
+  "description": "MCP TypeScript is based on OpenAI's model.",
+  "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "vite --port 3000",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "type-check": "tsc --noEmit"
+    "start": "tsc && node ./build/index.js",
+    "build": "tsc",
+    "build:web": "webpack --config webpack.config.cjs --mode production",
+    "dev": "webpack serve --config webpack.config.cjs --mode development"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@modelcontextprotocol/sdk": "^1.8.0",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "css-loader": "^7.1.2",
+    "dotenv": "^16.4.7",
+    "html-webpack-plugin": "^5.6.4",
+    "openai": "^4.90.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "style-loader": "^4.0.0",
+    "ts-loader": "^9.5.4",
+    "webpack": "^5.102.1",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.2"
   },
   "devDependencies": {
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
-    "@vitejs/plugin-react": "^4.2.0",
-    "typescript": "^5.3.0",
-    "vite": "^5.1.0"
-  },
-  "keywords": ["react", "typescript", "frontend", "search"],
-  "author": "",
-  "license": "MIT"
+    "@types/node": "^22.13.14",
+    "dotenv-webpack": "^8.1.1",
+    "typescript": "^5.8.2"
+  }
 }
