@@ -109,7 +109,11 @@ class MCPClient {
         return new StdioClientTransport(serverParams);
     }
     private async createSSETransport(url: string): Promise<SSEClientTransport> {
-        return new SSEClientTransport(new URL(url));
+        // 传递空的 eventSourceInit 对象，让 SDK 使用默认的 fetch
+        // 这样可以避免某些边缘情况的兼容性问题
+        return new SSEClientTransport(new URL(url), {
+            eventSourceInit: {}
+        });
     }
     async processQuery(query: string): Promise<string> {
         if (this.sessions.size === 0) {

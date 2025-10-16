@@ -13,8 +13,8 @@ RUN npm ci
 # 复制源代码
 COPY . .
 
-# 构建生产版本
-RUN npm run build
+# 构建前端静态资源（使用 webpack）
+RUN npm run build:web
 
 # Stage 2: 生产阶段
 FROM nginx:alpine
@@ -22,11 +22,11 @@ FROM nginx:alpine
 # 复制构建产物到 nginx 目录
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# 复制 nginx 配置（支持 SPA 路由）
+# 复制 nginx 配置（支持 SPA 路由，监听 9000 端口）
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# 暴露端口
-EXPOSE 80
+# 暴露端口 9000
+EXPOSE 9000
 
 # nginx 前台运行
 CMD ["nginx", "-g", "daemon off;"]

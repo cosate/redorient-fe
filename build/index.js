@@ -4,7 +4,7 @@ import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
 import OpenAI from "openai";
 import { createInterface } from "readline";
 import { homedir } from 'os';
-import config from "./config.js";
+import config from "./src/config.js";
 import dotenv from "dotenv";
 dotenv.config();
 // 初始化环境变量
@@ -85,7 +85,11 @@ class MCPClient {
         return new StdioClientTransport(serverParams);
     }
     async createSSETransport(url) {
-        return new SSEClientTransport(new URL(url));
+        // 传递空的 eventSourceInit 对象，让 SDK 使用默认的 fetch
+        // 这样可以避免某些边缘情况的兼容性问题
+        return new SSEClientTransport(new URL(url), {
+            eventSourceInit: {}
+        });
     }
     async processQuery(query) {
         if (this.sessions.size === 0) {

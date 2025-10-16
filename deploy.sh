@@ -50,36 +50,37 @@ case $choice in
         ;;
     2)
         print_message "启动前端服务..."
-        docker run -d --name redorient-frontend -p 3000:80 redorient-fe
+        docker run -d --name redorient-fe -p 9000:9000 redorient-fe
         sleep 3
-        if curl -f http://localhost:3000/ &>/dev/null; then
+        if curl -f http://localhost:9000/ &>/dev/null; then
             print_message "✅ 前端服务启动成功"
-            echo "🌐 访问地址: http://localhost:3000"
+            echo "🌐 访问地址: http://localhost:9000"
+            echo "🌐 域名访问: http://redorient.cn:9000"
         else
             print_warning "⚠️ 前端服务可能未就绪，请稍等..."
         fi
         ;;
     3)
         print_message "停止前端服务..."
-        docker stop redorient-frontend 2>/dev/null || true
-        docker rm redorient-frontend 2>/dev/null || true
+        docker stop redorient-fe 2>/dev/null || true
+        docker rm redorient-fe 2>/dev/null || true
         print_message "✅ 前端服务已停止"
         ;;
     4)
         print_message "服务状态:"
-        docker ps --filter "name=redorient-frontend"
+        docker ps --filter "name=redorient-fe"
         ;;
     5)
         print_message "查看前端日志:"
-        docker logs -f redorient-frontend
+        docker logs -f redorient-fe
         ;;
     6)
         print_warning "这将删除前端镜像!"
         read -p "确定要继续吗? (y/N): " confirm
         if [[ $confirm =~ ^[Yy]$ ]]; then
             print_message "停止并删除容器..."
-            docker stop redorient-frontend 2>/dev/null || true
-            docker rm redorient-frontend 2>/dev/null || true
+            docker stop redorient-fe 2>/dev/null || true
+            docker rm redorient-fe 2>/dev/null || true
             print_message "删除镜像..."
             docker rmi redorient-fe 2>/dev/null || true
             print_message "✅ 清理完成"

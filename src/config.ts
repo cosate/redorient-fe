@@ -2,7 +2,7 @@ const config = [
     {
       name: 'xb-sse',
       type: 'sse',
-      url: 'http://localhost:3002',
+      url: 'http://localhost:3002/sse',
       isOpen: true
     }
   ];
