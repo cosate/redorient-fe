@@ -38,6 +38,7 @@ module.exports = {
       path: './.env',
       safe: false,
       systemvars: true,
+      defaults: false,
       allowlist: [
         'OPENAI_API_KEY',
         'OPENAI_MODEL',

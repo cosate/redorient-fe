@@ -11,11 +11,6 @@ const ChatApp: React.FC = () => {
     OPENAI_BASE_URL: process.env.OPENAI_BASE_URL || "https://api.openai.com/v1"
   };
 
-  // 添加调试日志
-  useEffect(() => {
-    console.log("ChatApp rendered with env:", env);
-  }, [env]);
-
   const {
     messages,
     inputText,
@@ -28,11 +23,6 @@ const ChatApp: React.FC = () => {
     sendMessage,
     handleKeyPress
   } = useMCPClient({ env });
-
-  // 添加调试日志
-  useEffect(() => {
-    console.log("ChatApp state:", { isConnected, isLoading, messages, activeServers, error });
-  }, [isConnected, isLoading, messages, activeServers, error]);
 
   return (
     <div className="chat-app">
