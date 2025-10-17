@@ -1,6 +1,7 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport, StdioServerParameters } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
+import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import OpenAI from "openai";
 import { Tool } from "@modelcontextprotocol/sdk/types.js";
 import { ChatCompletionMessageParam, ChatCompletionMessageToolCall } from "openai/resources/chat/completions.js";
@@ -34,7 +35,7 @@ interface CommonDto {
 
 interface ServerConfig {
     name: string;
-    type: 'command' | 'sse';
+    type: 'command' | 'sse' | 'streamable';
     command?: string;
     url?: string;
     isOpen?: boolean;
@@ -44,7 +45,7 @@ class MCPClient {
         return config.filter(cfg => cfg.isOpen).map(cfg => cfg.name);
     }
     private sessions: Map<string, Client> = new Map();
-    private transports: Map<string, StdioClientTransport | SSEClientTransport> = new Map();
+    private transports: Map<string, StdioClientTransport | SSEClientTransport | StreamableHTTPClientTransport> = new Map();
     private openai: OpenAI;
     constructor() {
         this.openai = new OpenAI({
@@ -57,11 +58,13 @@ class MCPClient {
         if (!serverConfig) {
             throw new Error(`Server configuration not found for: ${serverName}`);
         }
-        let transport: StdioClientTransport | SSEClientTransport;
+        let transport: StdioClientTransport | SSEClientTransport | StreamableHTTPClientTransport;
         if (serverConfig.type === 'command' && serverConfig.command) {
             transport = await this.createCommandTransport(serverConfig.command);
         } else if (serverConfig.type === 'sse' && serverConfig.url) {
             transport = await this.createSSETransport(serverConfig.url);
+        } else if (serverConfig.type === 'streamable' && serverConfig.url) {
+            transport = await this.createStreamableHTTPTransport(serverConfig.url);
         } else {
             throw new Error(`Invalid server configuration for: ${serverName}`);
         }
@@ -114,6 +117,10 @@ class MCPClient {
         return new SSEClientTransport(new URL(url), {
             eventSourceInit: {}
         });
+    }
+    private async createStreamableHTTPTransport(url: string): Promise<StreamableHTTPClientTransport> {
+        console.log(`Creating Streamable HTTP transport for: ${url}`);
+        return new StreamableHTTPClientTransport(new URL(url));
     }
     async processQuery(query: string): Promise<string> {
         if (this.sessions.size === 0) {

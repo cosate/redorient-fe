@@ -37,7 +37,7 @@ const ChatApp: React.FC = () => {
   return (
     <div className="chat-app">
       <header className="chat-header">
-        <h1>MCP Client</h1>
+        <h1>RedOrient bot</h1>
         <ServerSelector
           onConnect={connectToServers}
           isConnected={isConnected}

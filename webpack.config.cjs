@@ -61,6 +61,17 @@ module.exports = {
     // ],
     client: {
       webSocketURL: 'auto://0.0.0.0:0/ws'  // 支持热更新
-    }
+    },
+    proxy: [
+      {
+        context: ['/mcp'],
+        target: 'http://127.0.0.1:3002',
+        changeOrigin: true,
+        ws: true,  // 支持 WebSocket
+        onProxyReq: (proxyReq, req, res) => {
+          console.log(`[Proxy] ${req.method} ${req.url} -> http://127.0.0.1:3002${req.url}`);
+        }
+      }
+    ]
   }
 };

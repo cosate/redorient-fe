@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "tsc && node ./build/index.js",
+    "start": "tsc && node ./dist/index.js",
     "build": "tsc",
     "build:web": "webpack --config webpack.config.cjs --mode production",
     "dev": "webpack serve --config webpack.config.cjs --mode development"

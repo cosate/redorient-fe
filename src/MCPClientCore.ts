@@ -1,5 +1,6 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
+import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import OpenAI from "openai";
 import { Tool } from "@modelcontextprotocol/sdk/types.js";
 import { ChatCompletionMessageParam, ChatCompletionMessageToolCall } from "openai/resources/chat/completions.js";
@@ -23,7 +24,7 @@ interface CommonDto {
 
 interface ServerConfig {
   name: string;
-  type: 'command' | 'sse';
+  type: 'command' | 'sse' | 'streamable';
   command?: string;
   url?: string;
   isOpen?: boolean;
@@ -35,13 +36,13 @@ export class MCPClientCore {
   }
 
   private sessions: Map<string, Client> = new Map();
-  private transports: Map<string, SSEClientTransport> = new Map();
+  private transports: Map<string, SSEClientTransport | StreamableHTTPClientTransport> = new Map();
   private openai: OpenAI;
   private env: EnvConfig;
 
   constructor(env: EnvConfig) {
     this.env = env;
-    // 在浏览器环境中，我们只支持 SSE 传输方式
+    // 在浏览器环境中，我们支持 SSE 和 Streamable HTTP 传输方式
     this.openai = new OpenAI({
       baseURL: env.OPENAI_BASE_URL,
       apiKey: env.OPENAI_API_KEY,
@@ -55,12 +56,16 @@ export class MCPClientCore {
       throw new Error(`Server configuration not found for: ${serverName}`);
     }
 
-    // 在前端环境中，我们只支持 SSE 传输方式
-    if (serverConfig.type !== 'sse' || !serverConfig.url) {
-      throw new Error(`Only SSE transport is supported in browser environment for server: ${serverName}`);
-    }
+    let transport: SSEClientTransport | StreamableHTTPClientTransport;
 
-    const transport = await this.createSSETransport(serverConfig.url);
+    // 在前端环境中，我们支持 SSE 和 Streamable HTTP 传输方式
+    if (serverConfig.type === 'sse' && serverConfig.url) {
+      transport = await this.createSSETransport(serverConfig.url);
+    } else if (serverConfig.type === 'streamable' && serverConfig.url) {
+      transport = await this.createStreamableHTTPTransport(serverConfig.url);
+    } else {
+      throw new Error(`Unsupported transport type for server: ${serverName}. Only SSE and Streamable HTTP are supported in browser.`);
+    }
 
     const client = new Client(
       {
@@ -88,6 +93,13 @@ export class MCPClientCore {
 
   private async createSSETransport(url: string): Promise<SSEClientTransport> {
     return new SSEClientTransport(new URL(url));
+  }
+
+  private async createStreamableHTTPTransport(url: string): Promise<StreamableHTTPClientTransport> {
+    // 在浏览器环境中，如果 URL 是相对路径，则拼接当前域名
+    const fullUrl = url.startsWith('http') ? url : `${window.location.origin}${url}`;
+    console.log(`Creating Streamable HTTP transport for: ${fullUrl}`);
+    return new StreamableHTTPClientTransport(new URL(fullUrl));
   }
 
   async processQuery(query: string): Promise<string> {

@@ -1,8 +1,8 @@
 const config = [
     {
-      name: 'xb-sse',
-      type: 'sse',
-      url: 'http://localhost:3002/sse',
+      name: 'hello-mcp',
+      type: 'streamable',
+      url: '/mcp',
       isOpen: true
     }
   ];
